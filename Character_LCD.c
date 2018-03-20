@@ -20,6 +20,14 @@ void SysTick_Handler(void)
   TimingDelay_Decrement();
 }
 
+/**
+  * @brief  Convert a single diget number to a char for LCD
+  * @param  None
+  * @retval None
+  */
+char int_to_char(uint8_t number) {
+  return (number | 0x30);
+}
 
 void disp_write_string(char *display_string) {
   disp_clear();

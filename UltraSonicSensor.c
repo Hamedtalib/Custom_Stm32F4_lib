@@ -132,6 +132,9 @@ static void _output_compare_config(void) {
 
   TIM_OC1Init(TRIG_TIM, &TIM_OCInitStructure);
 
+  /* Single pulse mode */
+  TIM_SelectOnePulseMode(TRIG_TIM, TIM_OPMode_Single);
+  
   /* TIM enable counter */
   TIM_Cmd(TRIG_TIM, ENABLE);
 
