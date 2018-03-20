@@ -22,6 +22,15 @@ void ultrasonic_init(void) {
 }
 
 /**
+  * @brief  Send the trigger signal to the sensor
+  * @param  None
+  * @retval None
+  */
+void ultrasonic_trig(void) {
+  
+}
+
+/**
   * @brief  Configure the TIM and GPIO port for the echo pin
   * @param  None
   * @retval None
