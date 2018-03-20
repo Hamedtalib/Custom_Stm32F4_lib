@@ -21,7 +21,7 @@ void SysTick_Handler(void)
 }
 
 /**
-  * @brief  Convert a single diget number to a char for LCD
+  * @brief  Convert a single digit number to a char for LCD
   * @param  None
   * @retval None
   */
@@ -87,14 +87,14 @@ void disp_command(char i) {
   disp_nybble();
 }
 
-void disp_nybble(void){
+static void disp_nybble(void){
   GPIO_SetBits(DISP_CONTROL_PORT, DISP_E_PIN); // E-> HIGH
   delay(DISP_NYB_DELAY);
   GPIO_ResetBits(DISP_CONTROL_PORT, DISP_E_PIN); // E-> LOW
 }
 
 
-void disp_GPIO_Setup(void) {
+static void disp_GPIO_Setup(void) {
   GPIO_InitTypeDef GPIO_InitStructure;
 
   /* GPIOD clock enable */

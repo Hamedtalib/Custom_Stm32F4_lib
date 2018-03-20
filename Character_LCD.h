@@ -24,13 +24,16 @@
 static __IO uint32_t TimingDelay;
 
 /* Private functions ---------------------------------------------------------*/
-void disp_nybble(void);
+static void disp_GPIO_Setup(void);
+static void disp_nybble(void);
+
+/* Public functions ---------------------------------------------------------*/
 void disp_command(char i);
-void disp_GPIO_Setup(void);
 void disp_init(void);
 void disp_write(char i);
 void disp_write_string(char *display_string);
 void disp_clear(void);
 void delay(__IO uint32_t nTime);   
 void TimingDelay_Decrement(void);
+char int_to_char(uint8_t number);
 
