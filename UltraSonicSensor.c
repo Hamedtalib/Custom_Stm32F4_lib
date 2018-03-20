@@ -46,17 +46,17 @@ static void _input_capture_config(void) {
   GPIO_Init(ECHO_GPIO_PORT, &GPIO_InitStructure);
 
   /* Connect TIM pins to AF1 */
-  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO_TIM_PIN, ECHO_TIME_AF);
+  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO_TIM_PIN, ECHO_TIM_AF);
 
   /* Enable the TIM global Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = ECHO_TIME_IRQ;
+  NVIC_InitStructure.NVIC_IRQChannel = ECHO_TIM_IRQ;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
 /* TIM configuration: Input Capture mode ---------------------*/
-  TIM_ICInitStructure.TIM_Channel = ECHO_TIME_CHANNEL;
+  TIM_ICInitStructure.TIM_Channel = ECHO_TIM_CHANNEL;
   TIM_ICInitStructure.TIM_ICPolarity =  TIM_ICPolarity_BothEdge;
   TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
   TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
