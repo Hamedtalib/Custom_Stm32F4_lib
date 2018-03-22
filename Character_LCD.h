@@ -17,7 +17,7 @@
 #define DISP_CONTROL_CLK        RCC_AHB1Periph_GPIOC
 #define DISP_E_PIN              GPIO_Pin_12
 #define DISP_RS_PIN             GPIO_Pin_11
-#define DISP_NYB_DELAY          ((uint32_t) 0x1)
+#define DISP_NYB_DELAY          ((uint32_t) 0x5)
 
 
 /* Private variables ---------------------------------------------------------*/
