@@ -38,37 +38,34 @@ void dip_init(void) {
   * @retval None
   */
 uint8_t dip_get_switch_state(uint8_t switch_number) {
-  uint16_t port_number = GPIO_Pin_0;
+  uint16_t port_number = DIP_GPIO_PIN0;
   switch(switch_number) {
     case 0 :
-      port_number = GPIO_Pin_0;
+      port_number = DIP_GPIO_PIN0;
       break;
     case 1 :
-      port_number = GPIO_Pin_1;
+      port_number = DIP_GPIO_PIN1;
       break;
     case 2 :
-      port_number = GPIO_Pin_2;
+      port_number = DIP_GPIO_PIN2;
       break;
     case 3 :
-      port_number = GPIO_Pin_3;
+      port_number = DIP_GPIO_PIN3;
       break;
     case 4 :
-      port_number = GPIO_Pin_4;
+      port_number = DIP_GPIO_PIN4;
       break;
     case 5 :
-      port_number = GPIO_Pin_5;
+      port_number = DIP_GPIO_PIN5;
       break;
     case 6 :
-      port_number = GPIO_Pin_6;
+      port_number = DIP_GPIO_PIN6;
       break;
     case 7 :
-      port_number = GPIO_Pin_7;
-      break;
-    case 8 :
-      port_number = GPIO_Pin_8;
+      port_number = DIP_GPIO_PIN7;
       break;
     default:
-      port_number = GPIO_Pin_0;
+      port_number = DIP_GPIO_PIN0;
   }
   return GPIO_ReadInputDataBit(DIP_GPIO_PORT, port_number);
 }

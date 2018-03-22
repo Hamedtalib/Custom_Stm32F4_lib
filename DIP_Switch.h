@@ -12,8 +12,16 @@
 
 #define DIP_GPIO_PORT	GPIOE
 #define DIP_GPIO_CLK	RCC_AHB1Periph_GPIOE
-#define DIP_GPIO_PINS	GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 
-#define DIP_GPIO_ALIGN	((uint8_t) 0x0)
+#define DIP_GPIO_PINS	DIP_GPIO_PIN0 | DIP_GPIO_PIN1 | DIP_GPIO_PIN2 | DIP_GPIO_PIN3 | DIP_GPIO_PIN4 | DIP_GPIO_PIN5 | DIP_GPIO_PIN6 | DIP_GPIO_PIN7 
+#define DIP_GPIO_ALIGN	((uint8_t) 0x8)
+#define DIP_GPIO_PIN0   GPIO_Pin_7
+#define DIP_GPIO_PIN1   GPIO_Pin_8
+#define DIP_GPIO_PIN2   GPIO_Pin_9
+#define DIP_GPIO_PIN3   GPIO_Pin_10
+#define DIP_GPIO_PIN4   GPIO_Pin_11
+#define DIP_GPIO_PIN5   GPIO_Pin_12
+#define DIP_GPIO_PIN6   GPIO_Pin_13
+#define DIP_GPIO_PIN7   GPIO_Pin_14
 
 
 /* Private variables ---------------------------------------------------------*/
