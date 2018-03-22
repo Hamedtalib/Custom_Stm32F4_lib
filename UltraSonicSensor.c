@@ -9,7 +9,48 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "UltraSonicSensor.h"
+#include "Character_LCD.h"
 
+   __IO uint32_t echo_count = 0;
+   __IO uint32_t capture = 0;
+   uint32_t echo_delay = 0;
+/**
+  * @brief  This function handles Trigger TIM global interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIM3_IRQHandler(void)
+{ 
+  if(TIM_GetITStatus(TRIG_TIM, TIM_IT_Update) != RESET) 
+  {
+    TIM_ClearITPendingBit(TRIG_TIM, TIM_IT_Update);
+  
+    
+    
+    
+    
+  }
+}
+
+/**
+  * @brief  This function handles Echo TIM global interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIM2_IRQHandler(void)
+{ 
+  if(TIM_GetITStatus(ECHO_TIM, TIM_IT_CC3) != RESET) 
+  {
+    TIM_ClearITPendingBit(ECHO_TIM, TIM_IT_CC3);
+   capture = TIM_GetCapture3(ECHO_TIM);
+    if(TIM_GetCapture3(ECHO_TIM)) {
+      echo_count++;
+    }
+    
+    echo_count++;
+  }
+}
+     
 
 /**
   * @brief  Initialize the Ultra Sonic sensor
@@ -17,7 +58,7 @@
   * @retval None
   */
 void ultrasonic_init(void) {
-  _input_capture_config();
+  //_input_capture_config();
   _output_compare_config();
 }
 
@@ -27,7 +68,31 @@ void ultrasonic_init(void) {
   * @retval None
   */
 void ultrasonic_trig(void) {
+  //enable the systick and load the clock value
+  if (SysTick_Config(SystemCoreClock / 1000))
+  { 
+    /* Capture error */ 
+  while (1);
+ }
+  _output_compare_config();
+  while (1) {
+    if(TIM3->CNT >= 2){
+      RCC_APB1PeriphClockCmd(TRIG_TIM_CLK, DISABLE);
+      break;
+    }
+  }
+}
+
+void ultrasonic_listen(void) {
   
+  _input_capture_config();
+  while(1) {
+    echo_delay ++;
+    if(echo_count == 2) {
+      break;
+    }
+    delay(1);
+  }
 }
 
 /**
@@ -74,7 +139,7 @@ static void _input_capture_config(void) {
   TIM_ICInit(ECHO_TIM, &TIM_ICInitStructure);
 
   /* TIM enable counter */
-  TIM_Cmd(ECHO_TIM, ENABLE);
+  //TIM_Cmd(ECHO_TIM, ENABLE);
 
   /* Enable the CC3 Interrupt Request */
   TIM_ITConfig(ECHO_TIM, TIM_IT_CC3, ENABLE);
@@ -92,6 +157,7 @@ static void _output_compare_config(void) {
   GPIO_InitTypeDef GPIO_InitStructure;
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_OCInitTypeDef  TIM_OCInitStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
 
   /* GPIO clock enable */
   RCC_AHB1PeriphClockCmd(TRIG_GPIO_CLK, ENABLE);
@@ -123,6 +189,13 @@ static void _output_compare_config(void) {
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
   TIM_TimeBaseInit(TRIG_TIM, &TIM_TimeBaseStructure);
+  
+  /* Enable the TIM global Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = TRIG_TIM_CHANNEL	;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 
   /* PWM1 Mode configuration: Channel1 */
   TIM_OCInitStructure.TIM_OCMode = TRIG_PWM_CHANNEL;
@@ -131,11 +204,16 @@ static void _output_compare_config(void) {
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
   TIM_OC1Init(TRIG_TIM, &TIM_OCInitStructure);
-
-  /* Single pulse mode */
-  TIM_SelectOnePulseMode(TRIG_TIM, TIM_OPMode_Single);
   
-  /* TIM enable counter */
+   /* TIM enable counter */
   TIM_Cmd(TRIG_TIM, ENABLE);
+  
+  /* Enable the CC3 Interrupt Request */
+  TIM_ITConfig(ECHO_TIM, TIM_IT_CC3, ENABLE);
+  
+  /* Single pulse mode */
+  //TIM_SelectOnePulseMode(TRIG_TIM, TIM_OPMode_Single);
+  
+  
 
 }

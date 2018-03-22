@@ -27,14 +27,17 @@
 #define TRIG_TIM_CLK	RCC_APB1Periph_TIM3
 #define TRIG_TIM_PIN	GPIO_PinSource6
 #define TRIG_TIM_AF	GPIO_AF_TIM3
-#define TRIG_PWM_CHANNEL	TIM_OCMode_PWM1
+#define TRIG_PWM_CHANNEL	TIM_OCMode_PWM2
+#define TRIG_TIM_CHANNEL	TIM_Channel_1
 
 
 /* Private variables ---------------------------------------------------------*/
-
+//static __IO uint32_t echo_count = 0;
+   
 /* Public functions ---------------------------------------------------------*/
 void ultrasonic_init(void);
 void ultrasonic_trig(void);
+void ultrasonic_listen(void);
 
 /* Private functions ---------------------------------------------------------*/
 static void _input_capture_config(void); // setup for echo pin
