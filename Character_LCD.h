@@ -7,6 +7,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include "Timing_Delay.h"
 
 #define __CHARACTER_LCD_H
 

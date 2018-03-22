@@ -53,12 +53,7 @@ void disp_clear(void) {
 }
 
 void disp_init(void){
-  //enable the systick and load the clock value
-  if (SysTick_Config(SystemCoreClock / 1000))
-  { 
-    /* Capture error */ 
-  while (1);
- }
+  delay_init();
   disp_GPIO_Setup();
   GPIO_ResetBits(DISP_CONTROL_PORT, DISP_E_PIN); // E-> LOW
   delay(DISP_NYB_DELAY * 100);

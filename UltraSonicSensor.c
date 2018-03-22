@@ -9,7 +9,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "UltraSonicSensor.h"
-#include "Character_LCD.h"
 
    __IO uint32_t echo_count = 0;
    __IO uint32_t capture = 0;
@@ -68,12 +67,6 @@ void ultrasonic_init(void) {
   * @retval None
   */
 void ultrasonic_trig(void) {
-  //enable the systick and load the clock value
-  if (SysTick_Config(SystemCoreClock / 1000))
-  { 
-    /* Capture error */ 
-  while (1);
- }
   _output_compare_config();
   while (1) {
     if(TIM3->CNT >= 2){
@@ -91,7 +84,7 @@ void ultrasonic_listen(void) {
     if(echo_count == 2) {
       break;
     }
-    delay(1);
+    delay_micro(1);
   }
 }
 
