@@ -7,6 +7,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "Timing_Delay.h"
 
 /**
   * @brief  
@@ -20,7 +21,7 @@ void SysTick_Handler(void)
 
 void delay_init(void) {
 //enable the systick and load the clock value
-  if (SysTick_Config(SystemCoreClock / 100))
+  if (SysTick_Config(SystemCoreClock / 1000000))
   {
     /* Capture error */
   while (1);
@@ -34,7 +35,7 @@ void delay_init(void) {
   * @retval None
   */
 void delay_micro(__IO uint32_t micro_time) { 
-  TimingDelay = nTime;
+  TimingDelay = micro_time;
 
   while(TimingDelay != 0);
 }
@@ -44,7 +45,7 @@ void delay_micro(__IO uint32_t micro_time) {
   * @retval None
   */
 void delay(uint32_t nTime) { 
-  __IO uint32_t micro_time = nTime * 10;
+  __IO uint32_t micro_time = nTime * 1000;
   delay_micro(micro_time);
 }
 
@@ -53,9 +54,10 @@ void delay(uint32_t nTime) {
   * @param  None
   * @retval None
   */
-static void TimingDelay_Decrement(void)
+void TimingDelay_Decrement(void)
 {
   if (TimingDelay != 0)
   { 
     TimingDelay--;
   }
+}

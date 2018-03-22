@@ -10,7 +10,7 @@
 static __IO uint32_t TimingDelay;
 
 /* Private functions ---------------------------------------------------------*/
-static void TimingDelay_Decrement(void);
+void TimingDelay_Decrement(void);
 
 /* Public functions ---------------------------------------------------------*/
 void delay_init(void);

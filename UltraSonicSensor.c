@@ -11,8 +11,8 @@
 #include "UltraSonicSensor.h"
 
    __IO uint32_t echo_count = 0;
-   __IO uint32_t capture = 0;
-   uint32_t echo_delay = 0;
+   float echo_delay = 0;
+   float distance_cm = 0;
 /**
   * @brief  This function handles Trigger TIM global interrupt request.
   * @param  None
@@ -41,11 +41,7 @@ void TIM2_IRQHandler(void)
   if(TIM_GetITStatus(ECHO_TIM, TIM_IT_CC3) != RESET) 
   {
     TIM_ClearITPendingBit(ECHO_TIM, TIM_IT_CC3);
-   capture = TIM_GetCapture3(ECHO_TIM);
-    if(TIM_GetCapture3(ECHO_TIM)) {
-      echo_count++;
-    }
-    
+   
     echo_count++;
   }
 }
@@ -58,7 +54,8 @@ void TIM2_IRQHandler(void)
   */
 void ultrasonic_init(void) {
   //_input_capture_config();
-  _output_compare_config();
+  //_output_compare_config();
+  delay_init();
 }
 
 /**
@@ -67,9 +64,11 @@ void ultrasonic_init(void) {
   * @retval None
   */
 void ultrasonic_trig(void) {
+  echo_count = 0;
+  echo_delay = 0;
   _output_compare_config();
   while (1) {
-    if(TIM3->CNT >= 2){
+    if(TIM3->CNT >= 2 || echo_delay > 36000){
       RCC_APB1PeriphClockCmd(TRIG_TIM_CLK, DISABLE);
       break;
     }
@@ -79,6 +78,8 @@ void ultrasonic_trig(void) {
 void ultrasonic_listen(void) {
   
   _input_capture_config();
+  
+  
   while(1) {
     echo_delay ++;
     if(echo_count == 2) {
@@ -86,6 +87,10 @@ void ultrasonic_listen(void) {
     }
     delay_micro(1);
   }
+  //RCC_APB1PeriphClockCmd(ECHO_TIM_CLK, DISABLE);
+  /* calc distance */
+  distance_cm = ((echo_delay - 550) / 58 ) ;
+  delay(1000);
 }
 
 /**
