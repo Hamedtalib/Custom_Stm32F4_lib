@@ -8,31 +8,31 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "UltraSonicSensor.h"
+#include "UltraSonicSensorX3.h"
 
   
 
 /* Private variables ---------------------------------------------------------*/
 __IO uint32_t distance1_cm = 0;
-__IO uint32_t 1uhIC3ReadValue1 = 0;
-__IO uint32_t 1uhIC3ReadValue2 = 0;
-__IO uint32_t 1uhCaptureNumber = 0;
-__IO uint32_t 1uwCapture1 = 0;
-__IO uint32_t 1echo_time = 0;
+__IO uint32_t ic_read_value_1_1 = 0;
+__IO uint32_t ic_read_value_2_1 = 0;
+__IO uint32_t capture_number_1 = 0;
+__IO uint32_t capture_1 = 0;
+__IO uint32_t echo_time_1 = 0;
 
 __IO uint32_t distance2_cm = 0;
-__IO uint32_t 2uhIC3ReadValue1 = 0;
-__IO uint32_t 2uhIC3ReadValue2 = 0;
-__IO uint32_t 2uhCaptureNumber = 0;
-__IO uint32_t 2uwCapture1 = 0;
-__IO uint32_t 2echo_time = 0;
+__IO uint32_t ic_read_value_1_2 = 0;
+__IO uint32_t ic_read_value_2_2 = 0;
+__IO uint32_t capture_number_2 = 0;
+__IO uint32_t capture_2 = 0;
+__IO uint32_t echo_time_2 = 0;
 
 __IO uint32_t distance3_cm = 0;
-__IO uint32_t 3uhIC3ReadValue1 = 0;
-__IO uint32_t 3uhIC3ReadValue2 = 0;
-__IO uint32_t 3uhCaptureNumber = 0;
-__IO uint32_t 3uwCapture1 = 0;
-__IO uint32_t 3echo_time = 0;
+__IO uint32_t ic_read_value_1_3 = 0;
+__IO uint32_t ic_read_value_2_3 = 0;
+__IO uint32_t capture_number_3 = 0;
+__IO uint32_t capture_3 = 0;
+__IO uint32_t echo_time_3 = 0;
 
 /**
   * @brief  This function handles Echo TIM global interrupt request.
@@ -41,36 +41,102 @@ __IO uint32_t 3echo_time = 0;
   */
 void TIM5_IRQHandler(void)
 { 
-  if(TIM_GetITStatus(ECHO_TIM, ECHO1_TIM_IT) == SET) 
-  {
+  // sensor 1
+  if(TIM_GetITStatus(ECHO_TIM, ECHO1_TIM_IT) == SET) {
     /* Clear TIM Capture compare interrupt pending bit */
     TIM_ClearITPendingBit(ECHO_TIM, ECHO1_TIM_IT);
-    if(1uhCaptureNumber == 0){
+    if(capture_number_1 == 0){
       /* Get the Input Capture value */
-      1uhIC3ReadValue1 = TIM_GetCapture1(ECHO_TIM);
-      1uhCaptureNumber = 1;
+      ic_read_value_1_1 = TIM_GetCapture1(ECHO_TIM);
+      capture_number_1 = 1;
     }
-    else if(1uhCaptureNumber == 1){
+    else if(capture_number_1 == 1){
       /* Get the Input Capture value */
-      1uhIC3ReadValue2 = TIM_GetCapture1(ECHO_TIM); 
+      ic_read_value_2_1 = TIM_GetCapture1(ECHO_TIM); 
       /* Capture computation */
-     if (1uhIC3ReadValue2 > 1uhIC3ReadValue1){
-        1uwCapture1 = (1uhIC3ReadValue2 - 1uhIC3ReadValue1);
+     if (ic_read_value_2_1 > ic_read_value_1_1){
+        capture_1 = (ic_read_value_2_1 - ic_read_value_1_1);
      }
-     else if (1uhIC3ReadValue2 < 1uhIC3ReadValue1){
-        1uwCapture1 = ((0xFFFFFFFF - 1uhIC3ReadValue1) + 1uhIC3ReadValue2);
+     else if (ic_read_value_2_1 < ic_read_value_1_1){
+        capture_1 = ((0xFFFFFFFF - ic_read_value_1_1) + ic_read_value_2_1);
      }
      else{
-        1uwCapture1 = 0;
+        capture_1 = 0;
      }
-     1echo_time = ((1uwCapture1 / (SystemCoreClock / 2000000 )) ); // echo time in micro seconds
-     if( 1echo_time >= 36000){ // 35 ms => no object detected
-       distance1_cm = 0;
+     echo_time_1 = ((capture_1 / (SystemCoreClock / 2000000 )) ); // echo time in micro seconds
+  //   if( echo_time_1 >= 36000){ // 35 ms => no object detected
+   //    distance1_cm = 0;
+   //  }
+   //  else {
+      distance1_cm = (echo_time_1 / 58);
+   //  }
+     capture_number_1 = 0;
+    }  
+  }
+  
+  // sensor 2
+  if(TIM_GetITStatus(ECHO_TIM, ECHO2_TIM_IT) == SET) {
+    /* Clear TIM Capture compare interrupt pending bit */
+    TIM_ClearITPendingBit(ECHO_TIM, ECHO2_TIM_IT);
+    if(capture_number_2 == 0){
+      /* Get the Input Capture value */
+      ic_read_value_1_2 = TIM_GetCapture2(ECHO_TIM);
+      capture_number_2 = 1;
+    }
+    else if(capture_number_2 == 1){
+      /* Get the Input Capture value */
+      ic_read_value_2_2 = TIM_GetCapture2(ECHO_TIM); 
+      /* Capture computation */
+     if (ic_read_value_2_2 > ic_read_value_1_2){
+        capture_2 = (ic_read_value_2_2 - ic_read_value_1_2);
      }
-     else {
-      distance1_cm = (echo_time / 58);
+     else if (ic_read_value_2_2 < ic_read_value_1_2){
+        capture_2 = ((0xFFFFFFFF - ic_read_value_1_2) + ic_read_value_2_2);
      }
-     1uhCaptureNumber = 0;
+     else{
+        capture_2 = 0;
+     }
+     echo_time_2 = ((capture_2 / (SystemCoreClock / 2000000 )) ); // echo time in micro seconds
+   //  if( echo_time_2 >= 36000){ // 35 ms => no object detected
+   //    distance2_cm = 0;
+   //  }
+   //  else {
+      distance2_cm = (echo_time_2 / 58);
+  //   }
+     capture_number_2 = 0;
+    }  
+  }
+  
+  // sensor 3
+  if(TIM_GetITStatus(ECHO_TIM, ECHO3_TIM_IT) == SET) {
+    /* Clear TIM Capture compare interrupt pending bit */
+    TIM_ClearITPendingBit(ECHO_TIM, ECHO3_TIM_IT);
+    if(capture_number_3 == 0){
+      /* Get the Input Capture value */
+      ic_read_value_1_3 = TIM_GetCapture3(ECHO_TIM);
+      capture_number_3 = 1;
+    }
+    else if(capture_number_3 == 1){
+      /* Get the Input Capture value */
+      ic_read_value_2_3 = TIM_GetCapture3(ECHO_TIM); 
+      /* Capture computation */
+     if (ic_read_value_2_3 > ic_read_value_1_3){
+        capture_3 = (ic_read_value_2_3 - ic_read_value_1_3);
+     }
+     else if (ic_read_value_2_3 < ic_read_value_1_3){
+        capture_3 = ((0xFFFFFFFF - ic_read_value_1_3) + ic_read_value_2_3);
+     }
+     else{
+        capture_3 = 0;
+     }
+     echo_time_3 = ((capture_3 / (SystemCoreClock / 2000000 )) ); // echo time in micro seconds
+  //   if( echo_time_3 >= 36000){ // 35 ms => no object detected
+  //     distance3_cm = 0;
+  //   }
+  //   else {
+      distance3_cm = (echo_time_3 / 58);
+  //   }
+     capture_number_3 = 0;
     }  
   }
 }
@@ -137,8 +203,11 @@ static void _input_capture_config(void) {
   GPIO_Init(ECHO_GPIO_PORT, &GPIO_InitStructure);
 
   /* Connect TIM pins to AF1 */
-  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO_TIM_PINS, ECHO_TIM_AF);
+  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO1_TIM_PIN, ECHO_TIM_AF);
+  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO2_TIM_PIN, ECHO_TIM_AF);
+  GPIO_PinAFConfig(ECHO_GPIO_PORT, ECHO3_TIM_PIN, ECHO_TIM_AF);
 
+  
   /* Enable the TIM global Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = ECHO_TIM_IRQ;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -147,7 +216,23 @@ static void _input_capture_config(void) {
   NVIC_Init(&NVIC_InitStructure);
 
 /* TIM configuration: Input Capture mode ---------------------*/
-  TIM_ICInitStructure.TIM_Channel = ECHO_TIM_CHANNELS;
+  TIM_ICInitStructure.TIM_Channel = ECHO1_TIM_CHANNEL;
+  TIM_ICInitStructure.TIM_ICPolarity =  TIM_ICPolarity_BothEdge;
+  TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+  TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+  TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+  TIM_ICInit(ECHO_TIM, &TIM_ICInitStructure);
+  
+  TIM_ICInitStructure.TIM_Channel = ECHO2_TIM_CHANNEL;
+  TIM_ICInitStructure.TIM_ICPolarity =  TIM_ICPolarity_BothEdge;
+  TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+  TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+  TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+  TIM_ICInit(ECHO_TIM, &TIM_ICInitStructure);
+  
+  TIM_ICInitStructure.TIM_Channel = ECHO3_TIM_CHANNEL;
   TIM_ICInitStructure.TIM_ICPolarity =  TIM_ICPolarity_BothEdge;
   TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
   TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
