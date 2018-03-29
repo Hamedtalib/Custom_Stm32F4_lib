@@ -34,12 +34,11 @@
 
 /* Public functions ---------------------------------------------------------*/
 void SCL_SPI_IRQHANDLER(void);
-void scl_init(void);
+void scl_init(uint8_t mode);
 void scl_send_char(char data);
 void scl_send_string(char *data);
 char scl_receive_char(void);
-void scl_set_mode_master(void);
-void scl_set_mode_slave(void);
+char * scl_receive_string(void);
 
 
 /* Private functions ---------------------------------------------------------*/

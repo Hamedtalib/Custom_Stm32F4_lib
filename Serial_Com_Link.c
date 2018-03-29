@@ -10,12 +10,12 @@
 #include "Timing_Delay.h"
 
 __IO uint8_t scl_tx_index;
-__IO uint16_t scl_tx_buffer[3] = { 0x0, 0x0, 0x0 };
-__IO uint8_t scl_tx_buffer_size = 3;
+__IO char * scl_tx_buffer;
+__IO uint8_t scl_tx_buffer_size = 16;
 
 __IO uint8_t scl_rx_index;
-__IO uint16_t scl_rx_buffer[3] = { 0x0, 0x0, 0x0 };
-__IO uint8_t scl_rx_buffer_size = 3;
+__IO char * scl_rx_buffer;
+__IO uint8_t scl_rx_buffer_size = 16;
 
 /**
   * @brief  This function handles SPI interrupt request.
@@ -57,25 +57,14 @@ void SCL_SPI_IRQHANDEL(void)
   
 }
 
-void scl_set_mode_master(void) {
-  SPI_InitTypeDef  SPI_InitStructure;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-  SPI_Init(SCL_SPI, &SPI_InitStructure);
-}
-
-void scl_set_mode_slave(void) {
-  SPI_InitTypeDef  SPI_InitStructure;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Slave;
-  SPI_Init(SCL_SPI, &SPI_InitStructure);
-}
 
 void scl_send_string(char *data) {
-  for(uint8_t i = 0; i < 32; i++) {
-    if( data[i] == '\0' ) {
-      return;
-    }
-    scl_send_char(data[i]);
-  }
+  scl_tx_index = 0;
+  scl_tx_buffer = data;
+  SPI_I2S_ITConfig(SCL_SPI, SPI_I2S_IT_TXE, ENABLE);
+   /* Waiting the end of Data transfer */
+  while (scl_tx_index < scl_tx_buffer_size){}
+  delay(1); // 1 millisecond delay
 }
 
 void scl_send_char(char data) {
@@ -83,18 +72,25 @@ void scl_send_char(char data) {
   scl_tx_buffer[0] = data;
   SPI_I2S_ITConfig(SCL_SPI, SPI_I2S_IT_TXE, ENABLE);
    /* Waiting the end of Data transfer */
-  while (scl_tx_index < 3){}
+  while (scl_tx_index < 1){}
   delay(1); // 1 millisecond delay
 }
 
 char scl_receive_char(void) {
   scl_rx_index = 0;
   SPI_I2S_ITConfig(SCL_SPI, SPI_I2S_IT_RXNE, ENABLE);
-  while (scl_rx_index < 3){}
+  while (scl_rx_index < 1){}
   return scl_rx_buffer[0];
 }
 
-void scl_init(void) {
+char *scl_receive_string(void) {
+  scl_rx_index = 0;
+  SPI_I2S_ITConfig(SCL_SPI, SPI_I2S_IT_RXNE, ENABLE);
+  while (scl_rx_index < scl_rx_buffer_size){}
+  return (char *)scl_rx_buffer;
+}
+
+void scl_init(uint8_t mode) {
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
   SPI_InitTypeDef  SPI_InitStructure;
@@ -134,12 +130,17 @@ void scl_init(void) {
  
   /* SPI configuration -------------------------------------------------------*/
   SPI_I2S_DeInit(SCL_SPI);
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+  if(mode == 0) {
+    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+  }
+  else {
+    SPI_InitStructure.SPI_Mode = SPI_Mode_Slave;
+  }
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_16b;
   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+  SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_InitStructure.SPI_CRCPolynomial = 7;
@@ -161,5 +162,7 @@ void scl_init(void) {
   
   scl_tx_index = 0;
   scl_rx_index = 0;
+  
+  delay_init();
 }
 
