@@ -72,7 +72,6 @@ void tempsensor_init(void) {
   /* Enable ADC */
   ADC_Cmd(TEMP_ADC, ENABLE);
 
-  //initialize delay timer
-  delay_init();
+  
 }
 
