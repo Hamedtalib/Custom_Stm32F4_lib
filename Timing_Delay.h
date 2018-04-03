@@ -2,12 +2,17 @@
  * Various timing delay functions
  *
  * @author      Tyler Thompson
- * @date        3/21/18-------------------------------------------------*/
+ * @date        3/21/18
+ */
 
 #define __TIMING_DELAY_H
 
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
+static uint8_t systick_initialized = 0;
 
 /* Private functions ---------------------------------------------------------*/
 void TimingDelay_Decrement(void);

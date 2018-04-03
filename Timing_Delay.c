@@ -5,8 +5,7 @@
  * @date        3/21/2018
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include "main.h"
+
 #include "Timing_Delay.h"
 
 /**
@@ -20,12 +19,14 @@ void SysTick_Handler(void)
 }
 
 void delay_init(void) {
-//enable the systick and load the clock value
-  if (SysTick_Config(SystemCoreClock / 1000000))
-  {
-    /* Capture error */
-  while (1);
- }
+  if(systick_initialized == 0){
+    systick_initialized = 1;
+    //enable the systick and load the clock value
+    if (SysTick_Config(SystemCoreClock / 1000000)) {
+      /* Capture error */
+      while (1);
+    }
+  }
 
 }
 

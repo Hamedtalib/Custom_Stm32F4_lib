@@ -9,14 +9,20 @@
 #include "Buzzer.h"
 
 
-void buz_sound(uint32_t frequency, uint32_t delay_time) {
+void buz_sound_delay(uint32_t frequency, uint32_t delay_time) {
+  buz_start_sound(frequency);
+  delay(delay_time);
+  buz_stop_sound();
+}
+
+void buz_start_sound(uint32_t frequency) {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_OCInitTypeDef  TIM_OCInitStructure;
 
     /* Compute the value to be set in ARR regiter to generate signal frequency */
   uint32_t TimerPeriod = (SystemCoreClock / (frequency * 2) -1);
   
-  //duty cycle
+  //duty cycle 50%
   uint16_t CCR1_Val = (uint16_t) (((uint32_t) 50 * (TimerPeriod + 1)) / 100);
   
   TIM_TimeBaseStructure.TIM_Period = TimerPeriod;
@@ -35,10 +41,11 @@ void buz_sound(uint32_t frequency, uint32_t delay_time) {
   TIM_OC3Init(BUZ_TIM, &TIM_OCInitStructure);
   
   TIM_Cmd(BUZ_TIM, ENABLE);
-  delay(delay_time);
-  TIM_Cmd(BUZ_TIM, DISABLE);
 }
 
+void buz_stop_sound(void) {
+   TIM_Cmd(BUZ_TIM, DISABLE);
+}
 
 /**
   * @brief  Initialize the TIM and GPIO port
@@ -65,34 +72,6 @@ void buz_init(void) {
   
 /* TIM clock enable */
   RCC_APB1PeriphClockCmd(BUZ_TIM_CLK, ENABLE);
-
-/*
-  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-  TIM_OCInitTypeDef  TIM_OCInitStructure;
-
-
-  uint32_t TimerPeriod = (SystemCoreClock / (3500 * 2) -1);
-  
-
-  uint16_t CCR1_Val = (uint16_t) (((uint32_t) 50 * (TimerPeriod + 1)) / 100);
-  
-  TIM_TimeBaseStructure.TIM_Period = TimerPeriod;
-  TIM_TimeBaseStructure.TIM_Prescaler = 0;
-  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-
-  TIM_TimeBaseInit(BUZ_TIM, &TIM_TimeBaseStructure);
-  
-
-  TIM_OCInitStructure.TIM_OCMode = BUZ_PWM_CHANNEL;
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
-  TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-
-  TIM_OC3Init(BUZ_TIM, &TIM_OCInitStructure);
-  
-  TIM_Cmd(BUZ_TIM, ENABLE);
-*/
 
   delay_init();
 }

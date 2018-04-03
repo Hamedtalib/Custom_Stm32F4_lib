@@ -26,6 +26,8 @@
 
 /* Public functions ---------------------------------------------------------*/
 void buz_init(void);
-void buz_sound(uint32_t frequency, uint32_t delay_time);
+void buz_sound_delay(uint32_t frequency, uint32_t delay_time);
+void buz_start_sound(uint32_t frequency);
+void buz_stop_sound(void);
 
 /* Private functions ---------------------------------------------------------*/
