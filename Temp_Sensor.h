@@ -19,13 +19,13 @@
 
 #define TEMP_ADC	ADC1
 #define TEMP_ADC_CHANNEL	ADC_Channel_4
-#define	TEMP_ADC_CLK	RCC_APB1Periph_ADC1
+#define	TEMP_ADC_CLK	RCC_APB2Periph_ADC1
 
 
 /* Private variables ---------------------------------------------------------*/
 
 /* Public functions ---------------------------------------------------------*/
 void tempsensor_init(void);
-uint32_t tempsensor_gettemp(void);
+float tempsensor_gettemp(void);
 
 /* Private functions ---------------------------------------------------------*/

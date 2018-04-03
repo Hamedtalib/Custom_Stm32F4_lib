@@ -9,10 +9,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "Temp_Sensor.h"
 
-uint32_t tempsesor_gettemp(void) {
- /* Start ADC Software Conversion */ 
-  ADC_SoftwareStartConv(ADC2);
 
+float tempsensor_gettemp(void) {
+  float temperature;
+ /* Start ADC Software Conversion */ 
+  ADC_SoftwareStartConv(TEMP_ADC);
+  /* wait for conversion to finish */
+ while(!ADC_IT_EOC){}
+  /* get the temperature in celcius */
+  temperature = (ADC_GetConversionValue(TEMP_ADC) / 27.4);
+  return temperature;
 }
 
 /**
@@ -24,7 +30,7 @@ void tempsensor_init(void) {
   ADC_InitTypeDef       ADC_InitStructure;
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   GPIO_InitTypeDef      GPIO_InitStructure;
-  //NVIC_InitTypeDef NVIC_InitStructure;
+ // NVIC_InitTypeDef NVIC_InitStructure;
 
   /* Enable ADC and GPIO clocks ****************************************/ 
   RCC_AHB1PeriphClockCmd(TEMP_GPIO_CLK, ENABLE);  
@@ -36,13 +42,6 @@ void tempsensor_init(void) {
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(TEMP_GPIO_PORT, &GPIO_InitStructure);
 
-/*
-  NVIC_InitStructure.NVIC_IRQChannel = ADC_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-*/
 
   /* ADC Common Init **********************************************************/
   ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
@@ -55,7 +54,7 @@ void tempsensor_init(void) {
   /* ADC Init ****************************************************************/
   ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
   ADC_InitStructure.ADC_ScanConvMode = DISABLE;
-  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
   ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
   ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
   ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
@@ -68,6 +67,8 @@ void tempsensor_init(void) {
 
   ADC_ITConfig(TEMP_ADC,ADC_IT_EOC,ENABLE);
 
+  ADC_EOCOnEachRegularChannelCmd(TEMP_ADC, ENABLE);
+  
   /* Enable ADC */
   ADC_Cmd(TEMP_ADC, ENABLE);
 
