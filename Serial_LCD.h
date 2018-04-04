@@ -14,8 +14,8 @@
 #define SLCD_GPIO_PORT	        GPIOB
 #define SLCD_GPIO_CLK	        RCC_AHB1Periph_GPIOB
 
-#define SLCD_SCK_PIN            GPIO_Pin_10 // SPI SCK -> CLK 10
-#define SLCD_SCK_SOURCE         GPIO_PinSource10
+#define SLCD_SCK_PIN            GPIO_Pin_13 // SPI SCK -> CLK 10
+#define SLCD_SCK_SOURCE         GPIO_PinSource13
 
 #define SLCD_MOSI_PIN           GPIO_Pin_15 // SPI MOSI -> SID 15
 #define SLCD_MOSI_SOURCE        GPIO_PinSource15
