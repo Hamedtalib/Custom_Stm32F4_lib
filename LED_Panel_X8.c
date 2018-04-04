@@ -8,7 +8,6 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "LED_Panel_X8.h"
 
 
@@ -33,11 +32,13 @@ void led_init(void) {
   GPIO_Init(LED_GPIO_PORT, &GPIO_InitStructure); 
   
   led_set_all(0xff); // initalize all leds off
+  delay_init(); // initialize delays for blink
 }
 
 /**
   * @brief  Set the state of an LED
-  * @param  None
+  * @param  led_number - the number of the LED to work with
+  * @param  state - the state to put the LED in
   * @retval None
   */
 void led_set_state(uint8_t led_number, uint8_t state) {
@@ -80,9 +81,26 @@ void led_set_state(uint8_t led_number, uint8_t state) {
 
 /**
   * @brief  Set the state of all LEDs
-  * @param  None
+  * @param  states - The states of a LEDs to set
   * @retval None
   */
 void led_set_all(uint16_t states) {
    LED_GPIO_PORT->ODR = (states << LED_GPIO_ALIGN);
+}
+
+/**
+  * @brief  Blink and LED a specified number of times with a specified delay
+  * @param  led_number - Which LED to work with
+  * @param  times - Number of times to blink
+  * @param  delay - number of milliseconds to delay between blinks
+  * @retval None
+  */
+void led_blink(uint8_t led_number, uint32_t times, uint32_t delay_time) {
+	for(uint8_t i = 0; i < times; i++) {
+		led_set_state(led_number, 1);
+		delay(delay_time / 2);
+		led_set_state(led_number, 0);
+		delay(delay_time / 2);
+
+	}
 }
