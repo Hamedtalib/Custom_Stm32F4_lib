@@ -36,6 +36,11 @@ void SLCD_SPI_IRQHANDEL(void)
   }
 }
 
+/**
+  * @brief  Send a string to the LCD
+  * @param  *data - the string to send
+  * @retval None
+  */
 void slcd_send_string(char *data) {
   slcd_clear();
   for(uint8_t i = 0; i < 32; i++) {
@@ -46,17 +51,34 @@ void slcd_send_string(char *data) {
   }
 }
 
+/**
+  * @brief  Send a single character to the LCD.
+  * @param  data - The character to send.
+  * @retval None
+  */
 void slcd_send_char(char data) {
   char higher_bits = data & 0xF0;
   char lower_bits = (data & 0x0F) << 4;
   slcd_send_data(0xFA, higher_bits, lower_bits);
 }
 
+/**
+  * @brief  Clear the LCD
+  * @param  None
+  * @retval None
+  */
 void slcd_clear(void){ 
   slcd_send_data(0xF8, 0x0, 0x10); // clear
   slcd_send_data(0xF8, 0x0, 0x20); // return home
 }
 
+/**
+  * @brief  Send raw instruction or data to the LCD.
+  * @param  cmd_bits - Instruction bits
+  * @param  higher_bits - Higher order bits
+  * @param  lower_bits - Lower order bits
+  * @retval None
+  */
 static void slcd_send_data(char cmd_bits, char higher_bits, char lower_bits) {
   tx_index = 0;
   tx_buffer[0] = cmd_bits;
@@ -68,6 +90,11 @@ static void slcd_send_data(char cmd_bits, char higher_bits, char lower_bits) {
   delay(1); // 1 millisecond delay
 }
 
+/**
+  * @brief  Initialize the LCD
+  * @param  None
+  * @retval None
+  */
 void slcd_init(void) {
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;

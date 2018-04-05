@@ -7,10 +7,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "UltraSonicSensor.h"
-
-  
 
 /* Private variables ---------------------------------------------------------*/
 __IO uint64_t distance_cm = 0;
