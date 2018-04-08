@@ -8,10 +8,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "Serial_LCD.h"
-#include "Timing_Delay.h"
 
-__IO uint8_t tx_index;
-__IO char tx_buffer[3] = { 0x0, 0x0, 0x0 };
+static __IO uint8_t tx_index;
+static __IO char tx_buffer[3] = { 0x0, 0x0, 0x0 };
+
+  char string_data[3] = { 0x30, 0x30, 0x30 };
+
+//char *string_data;
 
 /**
   * @brief  This function handles SPI interrupt request.
@@ -34,6 +37,14 @@ void SLCD_SPI_IRQHANDEL(void)
       SPI_I2S_ITConfig(SLCD_SPI, SPI_I2S_IT_TXE, DISABLE);
     }
   }
+}
+
+char * slcd_int_to_string(uint32_t data) {
+
+  string_data[0] = ((data /100) % 10) | 0x30;
+  string_data[1] = ((data /10) % 10) | 0x30;
+  string_data[2] = (data % 10) | 0x30;
+  return string_data;
 }
 
 /**

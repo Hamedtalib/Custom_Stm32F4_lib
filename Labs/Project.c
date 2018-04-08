@@ -18,9 +18,10 @@
 
 
 /* Private variables ---------------------------------------------------------*/
+char *test_val;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-uint8_t frequency_to_duty_conversion(uint32_t frequency);
+uint32_t frequency_to_duty_conversion(uint32_t frequency);
 
 /**
   * @brief  Main program
@@ -41,8 +42,7 @@ int main(void) {
 	/* motor encoder initialization */
 	encoder_init();
 
-	/* motor control initialization */
-	pwmmotor_init();
+	
 
 	/* Ultrasonic sensor initialization */
 	ultrasonic_init();
@@ -52,7 +52,11 @@ int main(void) {
 
 	/* buzzer initialization */
 	buz_init();
+        
+        /* motor control initialization */
+	pwmmotor_init();
 
+        slcd_send_string("Ready");
 
 	while (1) { 
 		// Switch 0 -> START
@@ -63,6 +67,7 @@ int main(void) {
 
 		/* START switch activated: active low */
 		if(dip_get_switch_state(0) == 0) {
+                        slcd_send_string("START");
 			// Turn on buzzer at 5.5Khz
 			buz_start_sound(5500);
 
@@ -80,13 +85,22 @@ int main(void) {
 			pwmmotor_enable();
 
 			uint8_t control_loop = 1;
-			while(control_loop) {
+                        uint32_t loop_counter = 0;
+			while(control_loop == 1) {
+                          // update LCD 
+                          loop_counter++;
+                          if(loop_counter == 10000) {
+                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in()));
+                                loop_counter = 0;
+                                pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
+                          }
 				// set the duty cycle of the motor control based on the frequency of the motor encoder
-				pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
+				//pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
 
 				// Check the STOP switch: active low
 				if(dip_get_switch_state(1) == 0){
-					control_loop == 0;
+					control_loop = 0;
+                                        slcd_send_string("STOP");
 				}
 			}
 
@@ -104,6 +118,9 @@ int main(void) {
 
 			// Turn off the buzzer
 			buz_stop_sound();
+                        
+                        // turn off IR LED
+			led_set_state(1, 0);
 
 		}
 	}

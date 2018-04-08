@@ -9,13 +9,13 @@
 #include "Motor_Encoder.h"
 
 /* Private variables ---------------------------------------------------------*/
-__IO uint16_t uhIC3ReadValue1 = 0;
-__IO uint16_t uhIC3ReadValue2 = 0;
-__IO uint16_t uhIC3ReadValue3 = 0;
-__IO uint16_t uhCaptureNumber = 0;
-__IO uint32_t uwCapture1 = 0;
-__IO uint32_t uwCapture2 = 0;
-__IO uint32_t encoder_frequency = 0;
+static __IO uint16_t uhIC3ReadValue1 = 0;
+static __IO uint16_t uhIC3ReadValue2 = 0;
+static __IO uint16_t uhIC3ReadValue3 = 0;
+static __IO uint16_t uhCaptureNumber = 0;
+static __IO uint32_t uwCapture1 = 0;
+static __IO uint32_t uwCapture2 = 0;
+static __IO uint32_t encoder_frequency = 0;
 //__IO uint32_t uwTIM2Duty = 0;
 
 /**

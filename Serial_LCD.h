@@ -8,6 +8,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "Timing_Delay.h"
 
 #define __SERIAL_LCD_H
 
@@ -36,6 +37,7 @@ void slcd_init(void);
 void slcd_clear(void);
 void slcd_send_char(char data);
 void slcd_send_string(char *data);
+char * slcd_int_to_string(uint32_t data);
 
 
 /* Private functions ---------------------------------------------------------*/

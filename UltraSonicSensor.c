@@ -10,13 +10,13 @@
 #include "UltraSonicSensor.h"
 
 /* Private variables ---------------------------------------------------------*/
-__IO uint64_t distance_cm = 0;
-__IO uint64_t distance_in = 0;
-__IO uint64_t uhIC3ReadValue1 = 0;
-__IO uint64_t uhIC3ReadValue2 = 0;
-__IO uint64_t uhCaptureNumber = 0;
-__IO uint64_t uwCapture1 = 0;
-__IO uint64_t echo_time = 0;
+static __IO uint64_t distance_cm = 0;
+static __IO uint64_t distance_in = 0;
+static __IO uint64_t uhIC3ReadValue1 = 0;
+static __IO uint64_t uhIC3ReadValue2 = 0;
+static __IO uint64_t uhCaptureNumber = 0;
+static __IO uint64_t uwCapture1 = 0;
+static __IO uint64_t echo_time = 0;
 
 /**
   * @brief  This function handles Echo TIM global interrupt request.
