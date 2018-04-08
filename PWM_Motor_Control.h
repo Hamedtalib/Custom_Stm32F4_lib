@@ -10,15 +10,15 @@
 
 #define __PWM_MOTOR_CONTROL_H
 
-#define MOTOR_GPIO_PORT	GPIOB
-#define MOTOR_GPIO_PIN	GPIO_Pin_10
-#define MOTOR_GPIO_CLK	RCC_AHB1Periph_GPIOB
-#define MOTOR_TIM	TIM2
-#define MOTOR_TIM_CLK	RCC_APB1Periph_TIM2
-#define MOTOR_TIM_PIN	GPIO_PinSource10
-#define MOTOR_TIM_AF	GPIO_AF_TIM2
+#define MOTOR_GPIO_PORT	        GPIOB
+#define MOTOR_GPIO_PIN	        GPIO_Pin_6
+#define MOTOR_GPIO_CLK	        RCC_AHB1Periph_GPIOB
+#define MOTOR_TIM	        TIM4
+#define MOTOR_TIM_CLK	        RCC_APB1Periph_TIM4
+#define MOTOR_TIM_PIN	        GPIO_PinSource6
+#define MOTOR_TIM_AF	        GPIO_AF_TIM4
 #define MOTOR_PWM_CHANNEL	TIM_OCMode_PWM1
-#define MOTOR_TIM_CHANNEL	TIM_Channel_3
+#define MOTOR_TIM_CHANNEL	TIM_Channel_1
 
 /* Private variables ---------------------------------------------------------*/
 static uint32_t frequency = 30000;

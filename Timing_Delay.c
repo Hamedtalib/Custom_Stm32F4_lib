@@ -8,6 +8,7 @@
 
 #include "Timing_Delay.h"
 
+
 /**
   * @brief  
   * @param  None
@@ -19,7 +20,7 @@ void SysTick_Handler(void)
 }
 
 void delay_init(void) {
-  if(systick_initialized == 0){
+  if(systick_initialized != 1){
     systick_initialized = 1;
     //enable the systick and load the clock value
     if (SysTick_Config(SystemCoreClock / 1000000)) {

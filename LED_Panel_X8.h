@@ -33,6 +33,6 @@
 void led_init(void);
 void led_set_state(uint8_t led_number, uint8_t state);
 void led_set_all(uint16_t states);
-void led_blink(uint8_t led_number, uint32_t times, uint32_t, delay_time);
+void led_blink(uint8_t led_number, uint32_t times, uint32_t delay_time);
 
 /* Private functions ---------------------------------------------------------*/

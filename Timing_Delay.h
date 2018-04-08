@@ -12,7 +12,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t TimingDelay;
-static uint8_t systick_initialized = 0;
+static uint8_t systick_initialized;
 
 /* Private functions ---------------------------------------------------------*/
 void TimingDelay_Decrement(void);
