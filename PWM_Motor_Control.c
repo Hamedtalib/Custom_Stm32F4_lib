@@ -42,7 +42,7 @@ void pwmmotor_init(void) {
   uint32_t TimerPeriod = (SystemCoreClock / (5000 * 2)) - 1;
   
   //duty cycle
-  uint16_t CCR1_Val = (uint16_t) (((uint32_t) 50 * (TimerPeriod + 1)) / 10);
+  uint16_t CCR1_Val = (uint16_t) (((uint32_t) 50 * (TimerPeriod + 1)) / 100);
 
   /* Time base configuration */
   TIM_TimeBaseStructure.TIM_Period = TimerPeriod;

@@ -90,7 +90,7 @@ int main(void) {
                           // update LCD 
                           loop_counter++;
                           if(loop_counter == 10000) {
-                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in()));
+                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in()) + 'i' + 'n');
                                 loop_counter = 0;
                                 pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
                           }
