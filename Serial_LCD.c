@@ -12,7 +12,7 @@
 static __IO uint8_t tx_index;
 static __IO char tx_buffer[3] = { 0x0, 0x0, 0x0 };
 
-  char string_data[3] = { 0x30, 0x30, 0x30 };
+char string_data[5] = { 0x30, 0x30, 0x30, 0x0, 0x0 };
 
 //char *string_data;
 
@@ -39,11 +39,13 @@ void SLCD_SPI_IRQHANDEL(void)
   }
 }
 
-char * slcd_int_to_string(uint32_t data) {
+char * slcd_int_to_string(uint32_t data, char *units) {
 
   string_data[0] = ((data /100) % 10) | 0x30;
   string_data[1] = ((data /10) % 10) | 0x30;
   string_data[2] = (data % 10) | 0x30;
+  string_data[3] = units[0];
+  string_data[4] = units[1];
   return string_data;
 }
 
@@ -52,13 +54,40 @@ char * slcd_int_to_string(uint32_t data) {
   * @param  *data - the string to send
   * @retval None
   */
-void slcd_send_string(char *data) {
-  slcd_clear();
+void slcd_send_string(char *data, uint8_t clear) {
+  if(clear == 1){
+    slcd_clear();
+  }
   for(uint8_t i = 0; i < 32; i++) {
     if( data[i] == '\0' ) {
       return;
     }
+    if ( i == 15 ) {
+     // slcd_set_line(1);
+    }
     slcd_send_char(data[i]);
+  }
+}
+
+void slcd_set_line(uint8_t line_number) {
+  switch(line_number) {
+  case 0 :
+    slcd_send_data(0xF8, 0x80, 0x00);
+    break;
+  case 1 :
+    slcd_send_data(0xF8, 0x90, 0x00);
+    break;
+ /*   
+  case 2 :
+    slcd_send_data(0xF8, 0xA0, 0x00);
+    break;
+    
+  case 3 :
+    slcd_send_data(0xF8, 0xB0, 0x00);
+    break;
+    */
+  default:
+    slcd_send_data(0xF8, 0x80, 0x00);
   }
 }
 

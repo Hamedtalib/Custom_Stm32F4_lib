@@ -36,8 +36,9 @@ void SLCD_SPI_IRQHANDLER(void);
 void slcd_init(void);
 void slcd_clear(void);
 void slcd_send_char(char data);
-void slcd_send_string(char *data);
-char * slcd_int_to_string(uint32_t data);
+void slcd_send_string(char *data, uint8_t clear);
+char * slcd_int_to_string(uint32_t data, char *units);
+void slcd_set_line(uint8_t line_number);
 
 
 /* Private functions ---------------------------------------------------------*/

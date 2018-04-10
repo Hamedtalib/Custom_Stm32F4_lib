@@ -23,7 +23,7 @@ static __IO uint64_t echo_time = 0;
   * @param  None
   * @retval None
   */
-void TIM5_IRQHandler(void)
+void ECHO_TIM_IRQ_HANDLE(void)
 { 
   if(TIM_GetITStatus(ECHO_TIM, ECHO_TIM_IT) == SET) 
   {
@@ -56,8 +56,8 @@ void TIM5_IRQHandler(void)
      
      echo_time = ((uwCapture1 / (SystemCoreClock / 2000000 )) ); // echo time in micro seconds
      if( echo_time >= 36000){ // 35 ms => no object detected
-       distance_cm = 0;
-      distance_in = 0;
+       distance_cm = 0xffffffff;
+      distance_in = 0xffffffff;
      }
      else {
       distance_cm = (echo_time / 58);
@@ -198,7 +198,7 @@ static void _output_compare_config(void) {
   TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
-  TIM_OC3Init(TRIG_TIM, &TIM_OCInitStructure);
+  TRIG_OC_INIT(TRIG_TIM, &TIM_OCInitStructure);
   
    /* TIM enable counter */
   TIM_Cmd(TRIG_TIM, ENABLE);

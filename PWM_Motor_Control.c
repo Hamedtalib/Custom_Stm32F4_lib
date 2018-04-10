@@ -8,8 +8,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "PWM_Motor_Control.h"
 
-static uint32_t frequency = 30000;
-static uint32_t duty = 50;
+static uint32_t init_frequency = 30000;
+static uint32_t init_duty = 50;
 
 /**
   * @brief  Initialize the PWM motor
@@ -39,10 +39,10 @@ void pwmmotor_init(void) {
   RCC_APB1PeriphClockCmd(MOTOR_TIM_CLK, ENABLE);
 
   /* Compute the value to be set in ARR regiter to generate signal frequency */
-  uint32_t TimerPeriod = (SystemCoreClock / (5000 * 2)) - 1;
+  uint32_t TimerPeriod = (SystemCoreClock / (init_frequency * 2)) - 1;
   
   //duty cycle
-  uint16_t CCR1_Val = (uint16_t) (((uint32_t) 50 * (TimerPeriod + 1)) / 100);
+  uint16_t CCR1_Val = (uint16_t) (((uint32_t) init_duty * (TimerPeriod + 1)) / 100);
 
   /* Time base configuration */
   TIM_TimeBaseStructure.TIM_Period = TimerPeriod;
@@ -58,10 +58,10 @@ void pwmmotor_init(void) {
   TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
-  TIM_OC3Init(MOTOR_TIM, &TIM_OCInitStructure);
+  MOTOR_OC_INIT(MOTOR_TIM, &TIM_OCInitStructure);
   
    /* TIM enable counter */
-  TIM_Cmd(MOTOR_TIM, ENABLE);
+  //TIM_Cmd(MOTOR_TIM, ENABLE);
 
 }
 
@@ -73,10 +73,10 @@ void pwmmotor_init(void) {
 void pwmmotor_set_duty(uint32_t duty) {
   TIM_OCInitTypeDef  TIM_OCInitStructure;
 
-  uint32_t TimerPeriod = (SystemCoreClock / (frequency * 2)) - 1;
+  uint32_t TimerPeriod = (SystemCoreClock / (init_frequency * 2)) - 1;
   
   //duty cycle
-  uint16_t CCR1_Val = (uint16_t) (((uint32_t) duty * (TimerPeriod - 1)) / 10);
+  uint16_t CCR1_Val = (uint16_t) (((uint32_t) duty * (TimerPeriod + 1)) / 100);
 
   /* PWM1 Mode configuration */
   TIM_OCInitStructure.TIM_OCMode = MOTOR_PWM_CHANNEL;
@@ -84,7 +84,7 @@ void pwmmotor_set_duty(uint32_t duty) {
   TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
   TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
 
-  TIM_OC3Init(MOTOR_TIM, &TIM_OCInitStructure);
+  MOTOR_OC_INIT(MOTOR_TIM, &TIM_OCInitStructure);
 }
 
 /**

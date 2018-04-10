@@ -22,6 +22,7 @@
 #define ECHO_TIM_CHANNEL	TIM_Channel_1
 #define ECHO_TIM_IRQ	TIM5_IRQn
 #define ECHO_TIM_IT     TIM_IT_CC1
+#define ECHO_TIM_IRQ_HANDLE     TIM5_IRQHandler
 
 #define TRIG_GPIO_PORT	GPIOB
 #define TRIG_GPIO_PIN	GPIO_Pin_10
@@ -32,12 +33,14 @@
 #define TRIG_TIM_AF	GPIO_AF_TIM2
 #define TRIG_PWM_CHANNEL	TIM_OCMode_PWM1
 #define TRIG_TIM_CHANNEL	TIM_Channel_3
+#define TRIG_OC_INIT            TIM_OC3Init
 
    
 /* Public functions ---------------------------------------------------------*/
 void ultrasonic_init(void);
 uint32_t ultrasonic_get_distance_cm(void);
 uint32_t ultrasonic_get_distance_in(void);
+void ECHO_TIM_IRQ_HANDLE(void);
 
 /* Private functions ---------------------------------------------------------*/
 static void _input_capture_config(void); // setup for echo pin

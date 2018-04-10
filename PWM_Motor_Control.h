@@ -19,6 +19,7 @@
 #define MOTOR_TIM_AF	        GPIO_AF_TIM4
 #define MOTOR_PWM_CHANNEL	TIM_OCMode_PWM1
 #define MOTOR_TIM_CHANNEL	TIM_Channel_3
+#define MOTOR_OC_INIT           TIM_OC3Init
 
 /* Private variables ---------------------------------------------------------*/
 

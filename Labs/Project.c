@@ -18,10 +18,12 @@
 
 
 /* Private variables ---------------------------------------------------------*/
-char *test_val;
+uint32_t encoder_freq = 0;
+uint32_t motor_duty = 0;
+uint32_t round_freq = 0;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-uint32_t frequency_to_duty_conversion(uint32_t frequency);
+uint32_t frequency_to_duty_conversion(uint32_t frequency, uint8_t old_duty);
 
 /**
   * @brief  Main program
@@ -29,20 +31,13 @@ uint32_t frequency_to_duty_conversion(uint32_t frequency);
   * @retval None
   */
 int main(void) {
-
- 	/* delay initialization */
-	delay_init();
+        delay_init();
 
 	/* Switch initialization */
 	dip_init();
 
 	/* LCD initialization */
-	slcd_init();
-
-	/* motor encoder initialization */
-	encoder_init();
-
-	
+	slcd_init();	
 
 	/* Ultrasonic sensor initialization */
 	ultrasonic_init();
@@ -55,8 +50,17 @@ int main(void) {
         
         /* motor control initialization */
 	pwmmotor_init();
+        
+        /* motor encoder initialization */
+	encoder_init();	
 
-        slcd_send_string("Ready");
+
+        slcd_send_string("TEST1TESTETSETSETSETSET", 0);
+        slcd_set_line(1);
+        slcd_send_string("TEST2", 0);
+
+        
+        slcd_send_string("Ready", 1);
 
 	while (1) { 
 		// Switch 0 -> START
@@ -67,7 +71,7 @@ int main(void) {
 
 		/* START switch activated: active low */
 		if(dip_get_switch_state(0) == 0) {
-                        slcd_send_string("START");
+                        slcd_send_string("START", 1);
 			// Turn on buzzer at 5.5Khz
 			buz_start_sound(5500);
 
@@ -79,20 +83,24 @@ int main(void) {
 
 			// turn on IR LED
 			led_set_state(1, 1);
+                        delay(100); // wait for IR to power on
 
 			// Turn on motor at frequency = 30KHz, Duty = 50%
-			pwmmotor_set_duty(50);
+			motor_duty = 50;
 			pwmmotor_enable();
 
 			uint8_t control_loop = 1;
                         uint32_t loop_counter = 0;
 			while(control_loop == 1) {
+                          
                           // update LCD 
                           loop_counter++;
-                          if(loop_counter == 10000) {
-                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in()) + 'i' + 'n');
+                          if(loop_counter == 80000) {
+                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in(), "in"), 1);
                                 loop_counter = 0;
-                                pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
+                                encoder_freq = encoder_get_frequency();
+                                motor_duty = frequency_to_duty_conversion(encoder_freq, motor_duty);
+                                pwmmotor_set_duty(motor_duty);
                           }
 				// set the duty cycle of the motor control based on the frequency of the motor encoder
 				//pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
@@ -100,7 +108,7 @@ int main(void) {
 				// Check the STOP switch: active low
 				if(dip_get_switch_state(1) == 0){
 					control_loop = 0;
-                                        slcd_send_string("STOP");
+                                        slcd_send_string("STOP", 1);
 				}
 			}
 
@@ -131,38 +139,38 @@ int main(void) {
   * @param  frequency - Frequency from the motor encoder
   * @retval duty - The duty cycle to set the motor
   */
-uint32_t frequency_to_duty_conversion(uint32_t frequency) {
-	uint32_t round_freq = frequency / 100;
-	uint8_t duty = 50;
+uint32_t frequency_to_duty_conversion(uint32_t conv_frequency, uint8_t old_duty) {
+	round_freq = conv_frequency / 100;
+	uint8_t new_duty = old_duty;
 
 	if(round_freq == 47) {
-		duty = 90;
+		new_duty = 90;
 	}
 	else if(round_freq == 49) {
-		duty = 80;
+		new_duty = 80;
 	}
 	else if(round_freq == 51) {
-		duty = 70;
+		new_duty = 70;
 	}
 	else if(round_freq == 53) {
-		duty = 60;
+		new_duty = 60;
 	}
 	else if(round_freq == 55) {
-		duty = 50;
+		new_duty = 50;
 	}
 	else if(round_freq == 57) {
-		duty = 40;
+		new_duty = 40;
 	}
 	else if(round_freq == 59) {
-		duty = 30;
+		new_duty = 30;
 	}
 	else if(round_freq == 61) {
-		duty = 20;
+		new_duty = 20;
 	}
 	else if(round_freq == 63) {
-		duty = 10;
+		new_duty = 10;
 	}
-	return duty;
+	return new_duty;
 }
 
 

@@ -15,7 +15,8 @@ static __IO uint16_t uhIC3ReadValue3 = 0;
 static __IO uint16_t uhCaptureNumber = 0;
 static __IO uint32_t uwCapture1 = 0;
 static __IO uint32_t uwCapture2 = 0;
-static __IO uint32_t encoder_frequency = 0;
+__IO uint32_t encoder_frequency = 0;
+uint32_t return_freq = 0;
 //__IO uint32_t uwTIM2Duty = 0;
 
 /**
@@ -32,13 +33,14 @@ void ENCODER_TIM_IRQ_HANDLE(void)
     if(uhCaptureNumber == 0)
     {
       /* Get the Input Capture value */
-      uhIC3ReadValue1 = TIM_GetCapture1(ENCODER_TIM);
+      uhIC3ReadValue1 = ENCODE_TIM_CAPTURE(ENCODER_TIM);
       uhCaptureNumber = 1;
     }
     else if(uhCaptureNumber == 1)
     {
       /* Get the Input Capture value */
-      uhIC3ReadValue2 = TIM_GetCapture1(ENCODER_TIM); 
+      uhIC3ReadValue2 = ENCODE_TIM_CAPTURE(ENCODER_TIM); 
+      uhCaptureNumber = 2;
       
       /* Capture computation */
      if (uhIC3ReadValue2 > uhIC3ReadValue1)
@@ -53,10 +55,11 @@ void ENCODER_TIM_IRQ_HANDLE(void)
      {
         uwCapture1 = 0;
      }
+     
     }  
    else if (uhCaptureNumber == 2) {
        /* Get the Input Capture value */
-      uhIC3ReadValue3 = TIM_GetCapture3(TIM2);
+      uhIC3ReadValue3 = ENCODE_TIM_CAPTURE(ENCODER_TIM);
 
        /* Capture computation */
       if (uhIC3ReadValue3 > uhIC3ReadValue2)
@@ -73,7 +76,7 @@ void ENCODER_TIM_IRQ_HANDLE(void)
       }
 
       /* Frequency computation */ 
-      encoder_frequency = (((uint32_t) SystemCoreClock / (uwCapture2 + uwCapture1)) / 2);
+      encoder_frequency = (((uint32_t) SystemCoreClock / (uwCapture2 + uwCapture1)) );
 //      uwTIM2Duty = ((uwCapture2 * 100) / (uwCapture2 + uwCapture1));
       uhCaptureNumber = 0;
      
@@ -94,7 +97,7 @@ void encoder_init(void) {
   TIM_ICInitTypeDef  TIM_ICInitStructure;
 
   /* TIM clock enable */
-  RCC_APB1PeriphClockCmd(ENCODER_TIM_CLK, ENABLE);
+  RCC_APB2PeriphClockCmd(ENCODER_TIM_CLK, ENABLE);
 
   /* GPIO clock enable */
   RCC_AHB1PeriphClockCmd(ENCODER_GPIO_CLK, ENABLE);
@@ -113,7 +116,7 @@ void encoder_init(void) {
   /* Enable the TIM global Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = ENCODER_TIM_IRQ;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 
@@ -135,5 +138,6 @@ void encoder_init(void) {
 }
 
 uint32_t encoder_get_frequency(void) {
-	return encoder_frequency;
+        return_freq = encoder_frequency;
+	return return_freq;
 }
