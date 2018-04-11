@@ -21,6 +21,13 @@
 uint32_t encoder_freq = 0;
 uint32_t motor_duty = 0;
 uint32_t round_freq = 0;
+uint32_t lower_freq = 0;
+uint32_t ultrasonic_dist = 0;
+uint8_t start_dist = 1; // inches
+uint8_t stop_dist = 10; // inches
+uint8_t motor_direction = 3;
+uint32_t lcd_counter = 0;
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 uint32_t frequency_to_duty_conversion(uint32_t frequency, uint8_t old_duty);
@@ -50,28 +57,53 @@ int main(void) {
         
         /* motor control initialization */
 	pwmmotor_init();
+        pwmmotor_disable(0); // disable forward
+        pwmmotor_disable(1); // disable reverse
         
         /* motor encoder initialization */
 	encoder_init();	
-
-
-        slcd_send_string("TEST1TESTETSETSETSETSET", 0);
-        slcd_set_line(1);
-        slcd_send_string("TEST2", 0);
-
         
-        slcd_send_string("Ready", 1);
-
+        
 	while (1) { 
+          lcd_counter++;
 		// Switch 0 -> START
 		// Switch 1 -> STOP
 		// LED -> led 0
 		// IR LED -> led 1
+                // START Distance = 1in
+                // STOP Distance = 10 in
 
-
+                // determine if box it at start or stop position and set direction
+                ultrasonic_dist = ultrasonic_get_distance_in();
+                if(ultrasonic_dist == start_dist){ // forward
+                  motor_direction = 0;
+                }
+                else if (ultrasonic_dist == stop_dist) { // reverse
+                  motor_direction = 1;
+                }
+                else {
+                  motor_direction = 3; // disabled
+                }
+                
+                // LCD update
+                if(lcd_counter == 840000) { // approximate update speed of 100ms
+                  lcd_counter = 0;
+                  slcd_set_direction(2);
+                  slcd_set_dist_start(ultrasonic_dist - start_dist);
+                  slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+                  slcd_send_update();
+                }
+                
 		/* START switch activated: active low */
-		if(dip_get_switch_state(0) == 0) {
-                        slcd_send_string("START", 1);
+		if(dip_get_switch_state(0) == 0 || motor_direction == 1 || motor_direction == 0 ) {
+                        //if no direction can be determined by ultrasonic, assume forward
+                        if ( motor_direction == 3) {
+                          motor_direction = 0;
+                        }
+ 
+                        slcd_set_direction(motor_direction);
+                        slcd_send_update();
+                        
 			// Turn on buzzer at 5.5Khz
 			buz_start_sound(5500);
 
@@ -87,37 +119,63 @@ int main(void) {
 
 			// Turn on motor at frequency = 30KHz, Duty = 50%
 			motor_duty = 50;
-			pwmmotor_enable();
+			pwmmotor_enable(motor_direction); // enable motor
 
 			uint8_t control_loop = 1;
                         uint32_t loop_counter = 0;
 			while(control_loop == 1) {
                           
-                          // update LCD 
+                          // LCD update
+                          lcd_counter++;
+                          if(lcd_counter == 840000){ // approximate update speed of 100ms
+                            lcd_counter = 0;
+                            slcd_set_dist_start(ultrasonic_dist - start_dist);
+                            slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+                            slcd_send_update();  
+                          }
+                          
+                          
+                          // slow update
                           loop_counter++;
-                          if(loop_counter == 80000) {
-                                slcd_send_string(slcd_int_to_string(ultrasonic_get_distance_in(), "in"), 1);
+                          if(loop_counter == 84000) {  // approximate update speed of 10ms
                                 loop_counter = 0;
+                                
+                                ultrasonic_dist = ultrasonic_get_distance_in();
+                            
+                                                              
+                                
+                                // set the duty cycle of the motor control based on the frequency of the motor encoder
                                 encoder_freq = encoder_get_frequency();
                                 motor_duty = frequency_to_duty_conversion(encoder_freq, motor_duty);
-                                pwmmotor_set_duty(motor_duty);
+                                pwmmotor_set_duty(motor_duty, motor_direction);
+                                
+                                
+                                // Check ultrasonic sensor distance
+				if( (ultrasonic_dist == stop_dist && motor_direction == 0) || (ultrasonic_dist == start_dist && motor_direction == 1) ){
+					control_loop = 0;
+                                        slcd_set_direction(2);
+                                        slcd_send_update();
+				}
                           }
-				// set the duty cycle of the motor control based on the frequency of the motor encoder
-				//pwmmotor_set_duty(frequency_to_duty_conversion(encoder_get_frequency()));
-
+				
+                          // fast update
+                          
 				// Check the STOP switch: active low
 				if(dip_get_switch_state(1) == 0){
 					control_loop = 0;
-                                        slcd_send_string("STOP", 1);
+                                        slcd_set_direction(2);
+                                        slcd_send_update();
 				}
 			}
 
 			/* object is at the end of the conveyor belt */
 
 			// disable motor
-			pwmmotor_set_duty(0);
-			pwmmotor_disable();
-
+			pwmmotor_set_duty(0, 0);
+                        pwmmotor_set_duty(0, 1);
+			pwmmotor_disable(0); // disable forward
+                        pwmmotor_disable(1); // disable reverse
+                        
 			// Turn on the buzzer at 3.5KHz
 			buz_start_sound(3500);
 
@@ -129,6 +187,8 @@ int main(void) {
                         
                         // turn off IR LED
 			led_set_state(1, 0);
+                        
+                        lcd_counter = 0;
 
 		}
 	}
@@ -140,7 +200,14 @@ int main(void) {
   * @retval duty - The duty cycle to set the motor
   */
 uint32_t frequency_to_duty_conversion(uint32_t conv_frequency, uint8_t old_duty) {
+        
+        /* round frequency on tens value */
+        lower_freq = (conv_frequency / 10 ) % 10;
 	round_freq = conv_frequency / 100;
+        if(lower_freq >= 5){
+          round_freq++;
+        }
+        
 	uint8_t new_duty = old_duty;
 
 	if(round_freq == 47) {

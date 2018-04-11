@@ -40,6 +40,11 @@ void slcd_send_string(char *data, uint8_t clear);
 char * slcd_int_to_string(uint32_t data, char *units);
 void slcd_set_line(uint8_t line_number);
 
+void slcd_set_direction(uint8_t direct);
+void slcd_set_dist_start(uint32_t dist);
+void slcd_set_dist_stop(uint32_t dist);
+void slcd_send_update(void);
+
 
 /* Private functions ---------------------------------------------------------*/
 static void slcd_send_data(char cmd_bits, char higher_bits, char lower_bits);

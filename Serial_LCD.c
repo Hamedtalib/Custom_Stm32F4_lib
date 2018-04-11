@@ -9,12 +9,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "Serial_LCD.h"
 
-static __IO uint8_t tx_index;
+ __IO uint8_t tx_index;
 static __IO char tx_buffer[3] = { 0x0, 0x0, 0x0 };
 
 char string_data[5] = { 0x30, 0x30, 0x30, 0x0, 0x0 };
-
-//char *string_data;
+char *slcd_direction = "STOPPED";
+char slcd_dist_info[15] = { 'S', 'R', 'T', 0x30, 0x30, 0x69, 0x6E, 0x5F, 'S', 'T', 'P', 0x30, 0x30, 0x69, 0x6E };
 
 /**
   * @brief  This function handles SPI interrupt request.
@@ -39,6 +39,40 @@ void SLCD_SPI_IRQHANDEL(void)
   }
 }
 
+void slcd_set_direction(uint8_t direct){ 
+  switch(direct) {
+  case 0 :
+    slcd_direction = "FORWARD";
+    break;
+  case 1:
+    slcd_direction = "REVERSE";
+    break;
+  case 2 :
+    slcd_direction = "STOPPED";
+    break;
+  default:
+    slcd_direction = "STOPPED";
+  }
+}
+
+
+void slcd_set_dist_start(uint32_t dist) {
+  slcd_dist_info[3] = ((dist /10) % 10) | 0x30;
+  slcd_dist_info[4] = (dist % 10) | 0x30;
+}
+
+void slcd_set_dist_stop(uint32_t dist){
+   slcd_dist_info[11] = ((dist /10) % 10) | 0x30;
+  slcd_dist_info[12] = (dist % 10) | 0x30;
+}
+
+
+void slcd_send_update(void){
+  slcd_send_string(slcd_dist_info, 1);
+  slcd_set_line(1);
+  slcd_send_string(slcd_direction, 0);
+}
+
 char * slcd_int_to_string(uint32_t data, char *units) {
 
   string_data[0] = ((data /100) % 10) | 0x30;
@@ -58,12 +92,9 @@ void slcd_send_string(char *data, uint8_t clear) {
   if(clear == 1){
     slcd_clear();
   }
-  for(uint8_t i = 0; i < 32; i++) {
+  for(uint8_t i = 0; i < 16; i++) {
     if( data[i] == '\0' ) {
       return;
-    }
-    if ( i == 15 ) {
-     // slcd_set_line(1);
     }
     slcd_send_char(data[i]);
   }
@@ -77,15 +108,6 @@ void slcd_set_line(uint8_t line_number) {
   case 1 :
     slcd_send_data(0xF8, 0x90, 0x00);
     break;
- /*   
-  case 2 :
-    slcd_send_data(0xF8, 0xA0, 0x00);
-    break;
-    
-  case 3 :
-    slcd_send_data(0xF8, 0xB0, 0x00);
-    break;
-    */
   default:
     slcd_send_data(0xF8, 0x80, 0x00);
   }
@@ -205,5 +227,6 @@ void slcd_init(void) {
   slcd_send_data(0xF8, 0x0, 0x20); // return home
   slcd_send_data(0xF8, 0x0, 0x60); // entry mode
   slcd_send_data(0xF8, 0x0, 0xC0); // display control
+  
+  
 }
-
