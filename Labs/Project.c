@@ -23,8 +23,8 @@ uint32_t motor_duty = 0;
 uint32_t round_freq = 0;
 uint32_t lower_freq = 0;
 uint32_t ultrasonic_dist = 0;
-uint8_t start_dist = 1; // inches
-uint8_t stop_dist = 10; // inches
+uint8_t start_dist = 3; // inches
+uint8_t stop_dist = 12; // inches
 uint8_t motor_direction = 3;
 uint32_t lcd_counter = 0;
 
@@ -96,11 +96,19 @@ int main(void) {
                 
 		/* START switch activated: active low */
 		if(dip_get_switch_state(0) == 0 || motor_direction == 1 || motor_direction == 0 ) {
-                        //if no direction can be determined by ultrasonic, assume forward
+                  
+                        // if the STOP switch is active, don't start
+                        if(dip_get_switch_state(1) == 0){
+                          continue;
+                        }
+                                         
+                        // if no direction can be determined by ultrasonic, assume forward
                         if ( motor_direction == 3) {
                           motor_direction = 0;
                         }
  
+                        slcd_set_dist_start(ultrasonic_dist - start_dist);
+                        slcd_set_dist_stop(stop_dist - ultrasonic_dist);
                         slcd_set_direction(motor_direction);
                         slcd_send_update();
                         
@@ -115,7 +123,6 @@ int main(void) {
 
 			// turn on IR LED
 			led_set_state(1, 1);
-                        delay(100); // wait for IR to power on
 
 			// Turn on motor at frequency = 30KHz, Duty = 50%
 			motor_duty = 50;
@@ -133,36 +140,35 @@ int main(void) {
                             slcd_set_dist_stop(stop_dist - ultrasonic_dist);
                             slcd_send_update();  
                           }
-                          
-                          
+                                                    
                           // slow update
                           loop_counter++;
                           if(loop_counter == 84000) {  // approximate update speed of 10ms
                                 loop_counter = 0;
                                 
-                                ultrasonic_dist = ultrasonic_get_distance_in();
-                            
-                                                              
+                                ultrasonic_dist = ultrasonic_get_distance_in();                                                              
                                 
                                 // set the duty cycle of the motor control based on the frequency of the motor encoder
                                 encoder_freq = encoder_get_frequency();
                                 motor_duty = frequency_to_duty_conversion(encoder_freq, motor_duty);
                                 pwmmotor_set_duty(motor_duty, motor_direction);
-                                
-                                
+                                                                
                                 // Check ultrasonic sensor distance
 				if( (ultrasonic_dist == stop_dist && motor_direction == 0) || (ultrasonic_dist == start_dist && motor_direction == 1) ){
 					control_loop = 0;
+                                        slcd_set_dist_start(ultrasonic_dist - start_dist);
+                                        slcd_set_dist_stop(stop_dist - ultrasonic_dist);
                                         slcd_set_direction(2);
                                         slcd_send_update();
 				}
                           }
 				
-                          // fast update
-                          
+                          // fast update - every cycle                          
 				// Check the STOP switch: active low
 				if(dip_get_switch_state(1) == 0){
 					control_loop = 0;
+                                        slcd_set_dist_start(ultrasonic_dist - start_dist);
+                                        slcd_set_dist_stop(stop_dist - ultrasonic_dist);
                                         slcd_set_direction(2);
                                         slcd_send_update();
 				}

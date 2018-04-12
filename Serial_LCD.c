@@ -14,7 +14,7 @@ static __IO char tx_buffer[3] = { 0x0, 0x0, 0x0 };
 
 char string_data[5] = { 0x30, 0x30, 0x30, 0x0, 0x0 };
 char *slcd_direction = "STOPPED";
-char slcd_dist_info[15] = { 'S', 'R', 'T', 0x30, 0x30, 0x69, 0x6E, 0x5F, 'S', 'T', 'P', 0x30, 0x30, 0x69, 0x6E };
+char slcd_dist_info[15] = { 'S', 'T', ':', 0x30, 0x30, 0x69, 0x6E, ' ', 'S', 'P', ':', 0x30, 0x30, 0x69, 0x6E };
 
 /**
   * @brief  This function handles SPI interrupt request.
@@ -57,12 +57,18 @@ void slcd_set_direction(uint8_t direct){
 
 
 void slcd_set_dist_start(uint32_t dist) {
+  if(dist >= 99) {
+    dist = 0;
+  }
   slcd_dist_info[3] = ((dist /10) % 10) | 0x30;
   slcd_dist_info[4] = (dist % 10) | 0x30;
 }
 
 void slcd_set_dist_stop(uint32_t dist){
-   slcd_dist_info[11] = ((dist /10) % 10) | 0x30;
+  if(dist >= 99) {
+    dist = 0;
+  }
+  slcd_dist_info[11] = ((dist /10) % 10) | 0x30;
   slcd_dist_info[12] = (dist % 10) | 0x30;
 }
 
