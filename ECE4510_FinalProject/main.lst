@@ -1,0 +1,375 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V8.20.2.14835/W32 for ARM       16/Apr/2018  11:59:10
+# Copyright 1999-2017 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\main.c
+#    Command line =  
+#        -f C:\Users\Dexter\AppData\Local\Temp\EWE633.tmp
+#        ("C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\main.c"
+#        -D USE_STDPERIPH_DRIVER -D STM32F429X -D USE_STM324x9I_EVAL -lcN
+#        "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\STM324x9I_EVAL\List"
+#        -o "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\STM324x9I_EVAL\Obj"
+#        --debug --endian=little --cpu=Cortex-M4 -e --fpu=VFPv4_sp
+#        --dlib_config "C:\Program Files (x86)\IAR Systems\Embedded Workbench
+#        8.0\arm\INC\c\DLib_Config_Full.h" -I "C:\Users\Dexter\Documents\IAR
+#        Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\"
+#        -I "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\..\..\..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include\"
+#        -I "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\..\..\..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc\"
+#        -I "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\..\..\..\..\Utilities\STM32_EVAL\Common\"
+#        -I "C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\..\..\..\..\Utilities\STM32_EVAL\STM324x9I_EVAL\"
+#        -Ohz --use_c++_inline -I "C:\Program Files (x86)\IAR Systems\Embedded
+#        Workbench 8.0\arm\CMSIS\Include\")
+#    Locale       =  C
+#    List file    =  
+#        C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\STM324x9I_EVAL\List\main.lst
+#    Object file  =  
+#        C:\Users\Dexter\Documents\IAR Embedded
+#        Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\STM324x9I_EVAL\Obj\main.o
+#
+###############################################################################
+
+C:\Users\Dexter\Documents\IAR Embedded Workbench\arm\8.20.2\ST\STM32F4xx\STM32F4xx_DSP_StdPeriph_Lib\Project\STM32F4xx_StdPeriph_Examples\GPIO\IO_Toggle\main.c
+      1          /**
+      2           * ECE4510 Final Project
+      3           *
+      4           * @author      Tyler Thompson
+      5           * @date        4/5/2018
+      6           */
+      7          
+      8          /* Includes ------------------------------------------------------------------*/
+      9          #include "main.h"
+     10          #include "lib\Timing_Delay.h"
+     11          #include "lib\DIP_Switch.h"
+     12          #include "lib\Serial_LCD.h"
+     13          #include "lib\Motor_Encoder.h"
+     14          #include "lib\PWM_Motor_Control.h"
+     15          #include "lib\UltraSonicSensor.h"
+     16          #include "lib\LED_Panel_X8.h"
+     17          #include "lib\Buzzer.h"
+     18          
+     19          
+     20          /* Private variables ---------------------------------------------------------*/
+     21          uint32_t encoder_freq = 0;
+     22          uint32_t motor_duty = 0;
+     23          uint32_t round_freq = 0;
+     24          uint32_t lower_freq = 0;
+     25          uint32_t ultrasonic_dist = 0;
+     26          uint8_t start_dist = 3; // inches
+     27          uint8_t stop_dist = 12; // inches
+     28          uint8_t motor_direction = 3;
+     29          uint32_t lcd_counter = 0;
+     30          
+     31          /* Private function prototypes -----------------------------------------------*/
+     32          /* Private functions ---------------------------------------------------------*/
+     33          uint32_t frequency_to_duty_conversion(uint32_t frequency, uint8_t old_duty);
+     34          
+     35          /**
+     36            * @brief  Main program
+     37            * @param  None
+     38            * @retval None
+     39            */
+     40          int main(void) {
+     41                  delay_init();
+     42          
+     43          	/* Switch initialization */
+     44          	dip_init();
+     45          
+     46          	/* LCD initialization */
+     47          	slcd_init();	
+     48          
+     49          	/* Ultrasonic sensor initialization */
+     50          	ultrasonic_init();
+     51          
+     52          	/* LED initialization */
+     53          	led_init();
+     54          
+     55          	/* buzzer initialization */
+     56          	buz_init();
+     57                  
+     58                  /* motor control initialization */
+     59          	pwmmotor_init();
+     60                  pwmmotor_disable(0); // disable forward
+     61                  pwmmotor_disable(1); // disable reverse
+     62                  
+     63                  /* motor encoder initialization */
+     64          	encoder_init();	
+     65                  
+     66                  
+     67          	while (1) { 
+     68                    lcd_counter++;
+     69          		// Switch 0 -> START
+     70          		// Switch 1 -> STOP
+     71          		// LED -> led 0
+     72          		// IR LED -> led 1
+     73                          // START Distance = 1in
+     74                          // STOP Distance = 10 in
+     75          
+     76                          // determine if box it at start or stop position and set direction
+     77                          ultrasonic_dist = ultrasonic_get_distance_in();
+     78                          if(ultrasonic_dist == start_dist){ // forward
+     79                            motor_direction = 0;
+     80                          }
+     81                          else if (ultrasonic_dist == stop_dist) { // reverse
+     82                            motor_direction = 1;
+     83                          }
+     84                          else {
+     85                            motor_direction = 3; // disabled
+     86                          }
+     87                          
+     88                          // LCD update
+     89                          if(lcd_counter == 840000) { // approximate update speed of 100ms
+     90                            lcd_counter = 0;
+     91                            slcd_set_direction(2);
+     92                            slcd_set_dist_start(ultrasonic_dist - start_dist);
+     93                            slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+     94                            slcd_send_update();
+     95                          }
+     96                          
+     97          		/* START switch activated: active low */
+     98          		if(dip_get_switch_state(0) == 0 || motor_direction == 1 || motor_direction == 0 ) {
+     99                            
+    100                                  // if the STOP switch is active, don't start
+    101                                  if(dip_get_switch_state(1) == 0){
+    102                                    continue;
+    103                                  }
+    104                                                   
+    105                                  // if no direction can be determined by ultrasonic, assume forward
+    106                                  if ( motor_direction == 3) {
+    107                                    motor_direction = 0;
+    108                                  }
+    109           
+    110                                  slcd_set_dist_start(ultrasonic_dist - start_dist);
+    111                                  slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+    112                                  slcd_set_direction(motor_direction);
+    113                                  slcd_send_update();
+    114                                  
+    115          			// Turn on buzzer at 5.5Khz
+    116          			buz_start_sound(5500);
+    117          
+    118          			// Blink LED 6 times at 1 blink/second
+    119          			led_blink(0, 6, 1000);
+    120          
+    121          			// turn off buzzer
+    122          			buz_stop_sound();
+    123          
+    124          			// turn on IR LED
+    125          			led_set_state(1, 1);
+    126          
+    127          			// Turn on motor at frequency = 30KHz, Duty = 50%
+    128          			motor_duty = 50;
+    129          			pwmmotor_enable(motor_direction); // enable motor
+    130          
+    131          			uint8_t control_loop = 1;
+    132                                  uint32_t loop_counter = 0;
+    133          			while(control_loop == 1) {
+    134                                    
+    135                                    // LCD update
+    136                                    lcd_counter++;
+    137                                    if(lcd_counter == 840000){ // approximate update speed of 100ms
+    138                                      lcd_counter = 0;
+    139                                      slcd_set_dist_start(ultrasonic_dist - start_dist);
+    140                                      slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+    141                                      slcd_send_update();  
+    142                                    }
+    143                                                              
+    144                                    // slow update
+    145                                    loop_counter++;
+    146                                    if(loop_counter == 84000) {  // approximate update speed of 10ms
+    147                                          loop_counter = 0;
+    148                                          
+    149                                          ultrasonic_dist = ultrasonic_get_distance_in();                                                              
+    150                                          
+    151                                          // set the duty cycle of the motor control based on the frequency of the motor encoder
+    152                                          encoder_freq = encoder_get_frequency();
+    153                                          motor_duty = frequency_to_duty_conversion(encoder_freq, motor_duty);
+    154                                          pwmmotor_set_duty(motor_duty, motor_direction);
+    155                                                                          
+    156                                          // Check ultrasonic sensor distance
+    157          				if( (ultrasonic_dist == stop_dist && motor_direction == 0) || (ultrasonic_dist == start_dist && motor_direction == 1) ){
+    158          					control_loop = 0;
+    159                                                  slcd_set_dist_start(ultrasonic_dist - start_dist);
+    160                                                  slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+    161                                                  slcd_set_direction(2);
+    162                                                  slcd_send_update();
+    163          				}
+    164                                    }
+    165          				
+    166                                    // fast update - every cycle                          
+    167          				// Check the STOP switch: active low
+    168          				if(dip_get_switch_state(1) == 0){
+    169          					control_loop = 0;
+    170                                                  slcd_set_dist_start(ultrasonic_dist - start_dist);
+    171                                                  slcd_set_dist_stop(stop_dist - ultrasonic_dist);
+    172                                                  slcd_set_direction(2);
+    173                                                  slcd_send_update();
+    174          				}
+    175          			}
+    176          
+    177          			/* object is at the end of the conveyor belt */
+    178          
+    179          			// disable motor
+    180          			pwmmotor_set_duty(0, 0);
+    181                                  pwmmotor_set_duty(0, 1);
+    182          			pwmmotor_disable(0); // disable forward
+    183                                  pwmmotor_disable(1); // disable reverse
+    184                                  
+    185          			// Turn on the buzzer at 3.5KHz
+    186          			buz_start_sound(3500);
+    187          
+    188          			// Blink LED 10 times at 2 blinks/second
+    189          			led_blink(0, 10, 500);
+    190          
+    191          			// Turn off the buzzer
+    192          			buz_stop_sound();
+    193                                  
+    194                                  // turn off IR LED
+    195          			led_set_state(1, 0);
+    196                                  
+    197                                  lcd_counter = 0;
+    198          
+    199          		}
+    200          	}
+    201          }
+    202          
+    203          /**
+    204            * @brief  Determine the motor duty cycle based on the encoder frequency
+    205            * @param  frequency - Frequency from the motor encoder
+    206            * @retval duty - The duty cycle to set the motor
+    207            */
+    208          uint32_t frequency_to_duty_conversion(uint32_t conv_frequency, uint8_t old_duty) {
+    209                  
+    210                  /* round frequency on tens value */
+    211                  lower_freq = (conv_frequency / 10 ) % 10;
+    212          	round_freq = conv_frequency / 100;
+    213                  if(lower_freq >= 5){
+    214                    round_freq++;
+    215                  }
+    216                  
+    217          	uint8_t new_duty = old_duty;
+    218          
+    219          	if(round_freq == 47) {
+    220          		new_duty = 90;
+    221          	}
+    222          	else if(round_freq == 49) {
+    223          		new_duty = 80;
+    224          	}
+    225          	else if(round_freq == 51) {
+    226          		new_duty = 70;
+    227          	}
+    228          	else if(round_freq == 53) {
+    229          		new_duty = 60;
+    230          	}
+    231          	else if(round_freq == 55) {
+    232          		new_duty = 50;
+    233          	}
+    234          	else if(round_freq == 57) {
+    235          		new_duty = 40;
+    236          	}
+    237          	else if(round_freq == 59) {
+    238          		new_duty = 30;
+    239          	}
+    240          	else if(round_freq == 61) {
+    241          		new_duty = 20;
+    242          	}
+    243          	else if(round_freq == 63) {
+    244          		new_duty = 10;
+    245          	}
+    246          	return new_duty;
+    247          }
+    248          
+    249          
+    250          #ifdef  USE_FULL_ASSERT
+    251          /**
+    252            * @brief  Reports the name of the source file and the source line number
+    253            *         where the assert_param error has occurred.
+    254            * @param  file: pointer to the source file name
+    255            * @param  line: assert_param error line source number
+    256            * @retval None
+    257            */
+    258          void assert_failed(uint8_t* file, uint32_t line)
+    259          {
+    260          
+    261            /* Infinite loop */
+    262            while (1)
+    263            {}
+    264          }
+    265          #endif
+    266          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      12   frequency_to_duty_conversion
+      32   main
+        32   -> buz_init
+        32   -> buz_start_sound
+        32   -> buz_stop_sound
+        32   -> delay_init
+        32   -> dip_get_switch_state
+        32   -> dip_init
+        32   -> encoder_get_frequency
+        32   -> encoder_init
+        32   -> frequency_to_duty_conversion
+        32   -> led_blink
+        32   -> led_init
+        32   -> led_set_state
+        32   -> pwmmotor_disable
+        32   -> pwmmotor_enable
+        32   -> pwmmotor_init
+        32   -> pwmmotor_set_duty
+        32   -> slcd_init
+        32   -> slcd_send_update
+        32   -> slcd_set_direction
+        32   -> slcd_set_dist_start
+        32   -> slcd_set_dist_stop
+        32   -> ultrasonic_get_distance_in
+        32   -> ultrasonic_init
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       4  ??DataTable1_1
+       4  ??DataTable1_2
+       4  ??DataTable1_3
+      10  ?Subroutine0
+      10  ?Subroutine1
+     110  frequency_to_duty_conversion
+     438  main
+       8  round_freq
+          lower_freq
+      20  start_dist
+          stop_dist
+          motor_direction
+          encoder_freq
+          motor_duty
+          ultrasonic_dist
+          lcd_counter
+
+ 
+   8 bytes in section .bss
+  20 bytes in section .data
+ 584 bytes in section .text
+ 
+ 584 bytes of CODE memory
+  28 bytes of DATA memory
+
+Errors: none
+Warnings: none
